@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rosa Pastel - Admin</title>
+    <script src="../utils/requestHelper.js"></script>
+    <script src="../utils/userRequests.js"></script>
+    <script src="../utils/utils.js"></script>
+    <script>
+        function performLogin() {
+            let email = document.getElementById('email').value
+            let password = document.getElementById('password').value
+            login(email,password).then((body) => {
+                if(!body.error){
+                    saveToken(body.data)
+                    window.location.replace(`dashboard.html`)
+                } else {
+                    alert('Email o contraseña incorrecta')
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+    Rosa Pastel - Admin <br><br>
+    <label for="fname">Correo: </label>
+    <input type="text" id="email" name="email"><br><br>
+    <label for="lname">Contraseña: </label>
+    <input type="text" id="password" name="password"><br><br>
+    <button onclick="performLogin()">Iniciar Sesión</button>
+</body>
+</html>

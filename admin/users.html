@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../utils/requestHelper.js"></script>
+    <script src="../utils/userRequests.js"></script>
+    <script src="../utils/utils.js"></script>
+    <script>
+        function loadUsers() {
+            let userList = document.getElementById('user_list')
+            userList.innerHTML = ''
+            getAll().then((body) => {
+                if(!body.error) {
+                    for(user of body.data) {
+                        userList.appendChild(userItem(user))
+                    }
+                }
+            })
+        }
+
+        function userItem(user) {
+            let nameLabel = document.createElement('H3');
+            nameLabel.innerText = user.name
+            
+            let deleteButton = document.createElement('button')
+            deleteButton.innerHTML = 'Eliminar'
+            deleteButton.onclick = function() {
+                deleteUserFront(user.email)
+            }
+
+            let userDiv = document.createElement('div')
+            userDiv.appendChild(nameLabel)
+            userDiv.appendChild(deleteButton)
+
+            return userDiv
+        }
+        
+        function deleteUserFront(email) {
+            deleteUser(email).then((body) => {
+                if(!body.error) {
+                    loadUsers()
+                }
+            })
+        }
+
+        function createUserForm() {
+            let email = document.getElementById('email').value
+            let name = document.getElementById('name').value
+            let password = document.getElementById('password').value
+            let isAdmin = document.getElementById('is_admin').checked
+            createUser(name,email,password,isAdmin).then((body) => {
+                console.log(body)
+                loadUsers()
+            })
+        }
+
+        window.onload = function() {
+            loadUsers()
+        }
+    </script>
+    <title>Rosa Pastel - Admin</title>
+</head>
+<body>
+    <h1>Crear un usuario nuevo</h1>
+    <label for="fname">Correo: </label>
+    <input type="text" id="email" name="email"><br><br>
+    <label for="lname">Nombre: </label>
+    <input type="text" id="name" name="name"><br><br>
+    <label for="lname">Contraseña: </label>
+    <input type="password" id="password" name="password"><br><br>
+    <label for="lname">Es administrador: </label>
+    <input type="checkbox" id="is_admin" name="is_admin"><br><br>
+    <button onclick="createUserForm()">Iniciar Sesión</button>
+
+
+    <h1>Usuarios</h1>
+    <div id='user_list'></div>
+</body>
+</html>

@@ -1,7 +1,12 @@
 let baseUrl = 'http://127.0.0.1:5000'
 
 async function GET(endPoint){
-    response = await fetch(`${baseUrl}/${endPoint}`)
+    response = await fetch(`${baseUrl}/${endPoint}`, {
+        headers:{
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getAuthToken()}`
+          }
+    })
     body = await response.json()
     return body
 }
@@ -9,9 +14,10 @@ async function GET(endPoint){
 async function requestWithBody(method,endPoint,body) {
     response = await fetch(`${baseUrl}/${endPoint}`, {
         method: method, 
-        body: JSON.stringify(body), 
+        body: JSON.stringify(body),
         headers:{
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAuthToken()}`
         }
       })
 
@@ -29,6 +35,20 @@ async function DELETE(endPoint,body){
 
 async function PATCH(endPoint,body){
     return await requestWithBody('PATCH',endPoint,body)
+}
+
+let authTokenKey = "authToken";
+
+function getAuthToken() {
+    let token = localStorage.getItem(authTokenKey)
+    if (token === null) {
+        token = ""
+    }
+    return token
+}
+
+function saveToken(token) {
+    localStorage.setItem(authTokenKey,token)
 }
 
 
