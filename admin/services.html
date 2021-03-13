@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../utils/requestHelper.js"></script>
+    <script src="../utils/servicesRequests.js"></script>
+    <script src="../utils/utils.js"></script>
+    <script>
+        function loadServices() {
+            let servicesList = document.getElementById('services_list')
+            servicesList.innerHTML = ''
+            getAllServices().then((body) => {
+                for(service of body.data) {
+                    servicesList.appendChild(serviceItem(service))
+                }
+            })
+        }
+
+        function serviceItem(service) {
+            let serviceName = document.createElement('h2')
+            serviceName.innerHTML = service.name
+
+            let priceLbl = document.createElement('p')
+            priceLbl.innerHTML = service.price
+
+            let durationLbl = document.createElement('p')
+            durationLbl.innerHTML = `Duracion: ${service.minutesDuration} minutos`
+
+            let deleteBtn = document.createElement('button')
+            deleteBtn.innerHTML = 'Delete'
+            deleteBtn.onclick = function() {
+                deleteService(service._id).then((body => {
+                    if(!body.error) {
+                        loadServices()
+                    }
+                }))
+            }
+
+            let serviceDiv = document.createElement('div')
+            serviceDiv.appendChild(serviceName)
+            serviceDiv.appendChild(priceLbl)
+            serviceDiv.appendChild(durationLbl)
+            serviceDiv.appendChild(deleteBtn)
+
+
+            return serviceDiv
+        }
+
+        function create() {
+            let name = document.getElementById('name').value
+            let price = parseInt(document.getElementById('price').value)
+            let duration = parseInt(document.getElementById('duration').value)
+            createService(name,price,duration).then((body) => {
+                if(!body.error) {
+                    loadServices()
+                }
+            })
+        }
+
+        window.onload = function() {
+            loadServices()
+        }
+
+    </script>
+    <title>Rosa Pastel - Admin</title>
+</head>
+<body>
+    <h1>Crear un nuevo servicio</h1>
+    <label for="fname">Nombre: </label>
+    <input type="text" id="name" name="name"><br><br>
+    <label for="fname">Precio: </label>
+    <input type="number" id="price" name="price"><br><br>
+    <label for="fname">Duracion en minutos: </label>
+    <input type="number" id="duration" name="duration"><br><br>
+    <button onclick="create()">Crear</button>
+    
+    <h1>Servicios</h1>
+    <div id='services_list'></div>
+</body>
+</html>
