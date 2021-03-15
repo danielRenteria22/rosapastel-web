@@ -321,7 +321,8 @@
                     hour12: false
                 },
                 dateClick: function(info){
-                    openCreateBookingModal(info)
+                    onDateClicked(info)
+                    
                 },
                 eventClick: function(info) {
                     showSummaryModal(info.event)
@@ -343,6 +344,16 @@
                 locale: 'es'
             });
             calendar.render();
+        }
+
+        function onDateClicked(info) {
+            let dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+            if(info.dateStr.match(dateRegex)) {
+                calendar.changeView('timeGridDay', info.dateStr);
+            } else {
+                openCreateBookingModal(info)
+            }
         }
         
         function openCreateBookingModal(date) {
