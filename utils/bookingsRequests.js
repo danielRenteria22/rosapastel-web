@@ -21,3 +21,7 @@ async function createForceBooking(start_time,service_id,user_id,name,phone) {
 
     return await POST('booking/create/force',body)
 }
+
+async function deleteBooking(id) {
+    return await DELETE(`booking/${id}`)
+}
