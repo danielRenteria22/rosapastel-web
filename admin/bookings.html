@@ -339,11 +339,13 @@
                     daysOfWeek: [ 1, 2, 3, 4 , 5, 6], // Monday - Saturday
 
                     startTime: '9:00', // a start time (10am in this example)
-                    endTime: '18:00', // an end time (6pm in this example)
+                    endTime: '19:01', // an end time (6pm in this example)
                 },
                 locale: 'es',
                 nowIndicator: true,
-                allDaySlot: false
+                allDaySlot: false,
+                slotMinTime: '09:00:00',
+                slotMaxTime: '19:00:00'
             });
             calendar.render();
         }
