@@ -4,9 +4,20 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Local JS -->
     <script src="../utils/requestHelper.js"></script>
     <script src="../utils/servicesRequests.js"></script>
     <script src="../utils/utils.js"></script>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="../assets/style/main.css">
+
+    <!-- CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
     <script>
         function loadServices() {
             let servicesList = document.getElementById('services_list')
@@ -14,6 +25,7 @@
             getAllServices().then((body) => {
                 for(service of body.data) {
                     servicesList.appendChild(serviceItem(service))
+                    servicesList.appendChild(document.createElement('br'))
                 }
             })
         }
@@ -22,14 +34,9 @@
             let serviceName = document.createElement('h2')
             serviceName.innerHTML = service.name
 
-            let priceLbl = document.createElement('p')
-            priceLbl.innerHTML = service.price
-
-            let durationLbl = document.createElement('p')
-            durationLbl.innerHTML = `Duracion: ${service.minutesDuration} minutos`
-
             let deleteBtn = document.createElement('button')
             deleteBtn.innerHTML = 'Delete'
+            deleteBtn.className = 'btn btn-danger'
             deleteBtn.onclick = function() {
                 deleteService(service._id).then((body => {
                     if(!body.error) {
@@ -38,11 +45,64 @@
                 }))
             }
 
+            let precioInput = createInput('number','Precio',service.price)
+            let durationInput = createInput('number','Duración en minutos',service.minutesDuration)
+
+            let editCheckBox = document.createElement('input')
+            editCheckBox.setAttribute('type','checkbox')
+            editCheckBox.className = 'form-check-input'
+            editCheckBox.onchange = function (params) {
+                if(editCheckBox.checked){
+                    precioInput.removeAttribute('readonly')
+                    durationInput.removeAttribute('readonly')
+                    updateButton.removeAttribute('disabled')
+                } else {
+                    precioInput.setAttribute('readonly','')
+                    durationInput.setAttribute('readonly','')
+                    updateButton.setAttribute('disabled','')
+                }
+            }
+
+            let updateButton = document.createElement('button')
+            updateButton.innerHTML = 'Actualizar'
+            updateButton.className = 'btn btn-success'
+            updateButton.setAttribute('disabled','')
+            updateButton.onclick = function () {
+                let price = parseInt(precioInput.value)
+                let duration = parseInt(durationInput.value)
+                let name = service.name
+                let id = service._id
+                updateService(id,name,price,duration).then((body) => {
+                    if(body.error) {
+                        alert('Ocurrió un error')
+                        console.log(body)
+                        loadServices()
+                    } else {
+                        precioInput.setAttribute('readonly','')
+                        durationInput.setAttribute('readonly','')
+                        updateButton.setAttribute('disabled','')
+                        editCheckBox.checked = false
+                    }
+                })
+            }
+
+            let cardBody = document.createElement('div')
+            cardBody.className = 'card-body'
+            cardBody.appendChild(createInputGroup('Precio',precioInput))
+            cardBody.appendChild(createInputGroup('Duración en minutos',durationInput))
+            cardBody.appendChild(deleteBtn)
+            cardBody.appendChild(createCheckboxGroup('Editar:', editCheckBox))
+            cardBody.appendChild(updateButton)
+
             let serviceDiv = document.createElement('div')
-            serviceDiv.appendChild(serviceName)
-            serviceDiv.appendChild(priceLbl)
-            serviceDiv.appendChild(durationLbl)
-            serviceDiv.appendChild(deleteBtn)
+            serviceDiv.className = 'card'
+
+            let cardHeader = document.createElement('h5')
+            cardHeader.className = 'card-header'
+            cardHeader.innerHTML = service.name
+
+            serviceDiv.appendChild(cardHeader)
+            serviceDiv.appendChild(cardBody)
 
 
             return serviceDiv
@@ -59,6 +119,41 @@
             })
         }
 
+        function createInput(type,name,value) {
+            let input = document.createElement('input')
+            input.className = 'form-control'
+            input.setAttribute('placeholder',name)
+            input.setAttribute('type',type)
+            input.setAttribute('value',value)
+            input.setAttribute('readonly','')
+
+            return input
+        }
+        
+        function createInputGroup(labelStr,input) {
+            let label = document.createElement('label')
+            label.innerHTML = labelStr
+
+            let formGroup = document.createElement('div')
+            formGroup.className = 'form-group'
+            formGroup.appendChild(label)
+            formGroup.appendChild(input)
+
+            return formGroup
+        }
+
+        function createCheckboxGroup(labelStr,checkBox) {
+            let label = document.createElement('label')
+            label.innerHTML = labelStr
+
+            let formGroup = document.createElement('div')
+            formGroup.className = 'form-check'
+            formGroup.appendChild(checkBox)
+            formGroup.appendChild(label)
+
+            return formGroup
+        }
+
         window.onload = function() {
             loadServices()
         }
@@ -68,13 +163,21 @@
 </head>
 <body>
     <h1>Crear un nuevo servicio</h1>
-    <label for="fname">Nombre: </label>
-    <input type="text" id="name" name="name"><br><br>
-    <label for="fname">Precio: </label>
-    <input type="number" id="price" name="price"><br><br>
-    <label for="fname">Duracion en minutos: </label>
-    <input type="number" id="duration" name="duration"><br><br>
-    <button onclick="create()">Crear</button>
+    <div class="form-group">
+        <input type="text" id="name" placeholder="Nombre" class="form-control form-control">
+    </div>
+    
+    <div class="form-group">
+        <input type="number" id="price" placeholder="Precio" class="form-control form-control" min="0">
+    </div>
+
+    <div class="form-group">
+        <input type="number" id="duration" placeholder="Duración en minutos" class="form-control form-control" min="0">
+    </div>
+
+    <button onclick="create()" class="btn btn-primary">Crear</button>
+
+    <hr>
     
     <h1>Servicios</h1>
     <div id='services_list'></div>
