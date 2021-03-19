@@ -15,6 +15,8 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src='fullcalendar/core/locales/es.js'></script>
     <link href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.1/css/all.css' rel='stylesheet'>
@@ -254,7 +256,9 @@
                     'user_name': booking.user.name,
                     'client_name': booking.name,
                     'client_phone': booking.phone,
-                    'service_name': booking.service.name
+                    'service_name': booking.service.name,
+                    'comment': booking.comment,
+                    'reference_url': booking.reference_url
                 }
             }
             return event
@@ -401,6 +405,14 @@
             summaryClientPhone.innerHTML = `Telefono: ${event.extendedProps.client_phone}`
             
             modalSummary.style.display = "block";
+
+            if(event.extendedProps.comment != null || event.extendedProps.reference_url != null){
+                document.getElementById('btnShowReferences').style.display = 'block'
+                document.getElementById('comment').innerHTML = event.extendedProps.comment
+                document.getElementById('reference_image').setAttribute('src',event.extendedProps.reference_url)
+            } else {
+                document.getElementById('btnShowReferences').style.display = 'none'
+            }
 
         }
 
@@ -550,6 +562,18 @@
                 <p id="summaryService">Servicio: </p>
                 <p id="summaryClientName">Nombre: </p>
                 <p id="summaryClientPhone">Nombre: </p>
+                <p>
+                    <button class="btn btn-primary" id="btnShowReferences" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                        Mostrar referencias
+                    </button>
+                </p>
+                <div class="collapse" id="collapseExample">
+                    <div class="card card-body">
+                      <p id="comment"></p>
+                      <img id="reference_image" style="margin: auto; max-width: 350px;">
+                    </div>
+                </div>
+                <br>
                 <button onclick="deleteEvent()">Eliminar</button>
             </div>
         </div>
