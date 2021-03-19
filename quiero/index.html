@@ -138,6 +138,7 @@
         function hideModal() {
             modalOpen = false
             modal.style.display = "none";
+            restartModalValues()
         }
 
         function loadServices() {
@@ -146,6 +147,7 @@
                 let serviceSelect = document.getElementById('services')
                 let emptyOption = document.createElement('option')
                 emptyOption.innerHTML = 'Seleccionar servicio...'
+                emptyOption.setAttribute('value','null')
                 serviceSelect.appendChild(emptyOption)
                 var index = 0;
                 for(service of services){
@@ -171,6 +173,10 @@
                 }
                 let userSelect = document.getElementById('user')
                 userSelect.innerHTML = ''
+                let emptyOptin = document.createElement('option')
+                emptyOptin.innerHTML = 'Seleccionar manicurista...'
+                emptyOptin.setAttribute('value','null')
+                userSelect.appendChild(emptyOptin)
                 var index = 0
                 for(user of users){
                     let option = document.createElement('option')
@@ -186,14 +192,19 @@
         }
 
         function serviceSelected() {
+            let serviceSelect = document.getElementById('services')
+            if(serviceSelect.value === "null") return
             document.getElementById('loadingModal').style.display = 'block'
             loadingAnimation.play()
-            let serviceSelect = document.getElementById('services')
             let index = parseInt(serviceSelect.value)
             loadUsers(services[index]._id)
         }
 
         function sendSMSCode() {
+            if(!isInfoValid()) {
+                alert('Información incorrecta o incompleta. Porfavor, revisa la información.')
+                return
+            }
             let phone = document.getElementById('phone').value
             // sendSMS(phone).then((body) => {
             //     if(!body.error) {
@@ -222,6 +233,10 @@
         }
 
         function create() {
+            if(document.getElementById('code').value === ""){
+                alert('Por favor, ingresa un código valido')
+                return
+            }
             document.getElementById('loadingModal').style.display = 'block'
             loadingAnimation.play()
             let phone = document.getElementById('phone').value
@@ -251,6 +266,7 @@
             formData.append('data', data);
 
             createBooking(formData).then((body) => {
+                restartModalValues()
                 loadingAnimation.stop()
                 document.getElementById('loadingModal').style.display = 'none'
                 if(!body.error) {
@@ -260,6 +276,26 @@
                     alert(`Ocurrio un error: ${body.message}`)
                 }
             })
+        }
+
+        function isInfoValid() {
+            if(document.getElementById('services').value === "null") return false
+            if(document.getElementById('user').value === "null") return false
+            if(!document.getElementById('phone').value.match(/^\d{10}$/)) return false
+            if(document.getElementById('name').value === "")  return false
+            return true
+        }
+
+        function restartModalValues() {
+            document.getElementById('services').value = "null"
+            document.getElementById('user').value = ""
+            document.getElementById('phone').value = ""
+            document.getElementById('name').value = ""
+            document.getElementById('code').value = ""
+            document.getElementById('modalInfo').style.display = 'none'
+
+            let userSelect = document.getElementById('user')
+            userSelect.innerHTML = ''
         }
 
         window.onload = function() {
@@ -284,6 +320,7 @@
                 modalOpen = false
                 if (event.target == modal) {
                     modal.style.display = "none";
+                    restartModalValues()
                 }
 
                 if(event.target == modalSms){
