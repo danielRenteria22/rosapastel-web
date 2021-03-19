@@ -135,10 +135,10 @@
             modalOpen = true
         }
 
-        function hideModal() {
+        function hideModal(restart = true) {
             modalOpen = false
             modal.style.display = "none";
-            restartModalValues()
+            if(restart) restartModalValues()
         }
 
         function loadServices() {
@@ -206,22 +206,16 @@
                 return
             }
             let phone = document.getElementById('phone').value
-            // sendSMS(phone).then((body) => {
-            //     if(!body.error) {
-            //         console.log(body)
-            //         codeId = body.data
-            //         hideModal()
-            //         console.log('Hiodden')
-            //         showSmsModal()
-            //         console.log('Shwing')
-            //     } else {
-            //         alert('Ocurrio un error inesperado. Porfavor intentalo más tarde')
-            //     }
-            // })
+            sendSMS(phone).then((body) => {
+                if(!body.error) {
+                    codeId = body.data
+                    hideModal(false)
+                    showSmsModal()
+                } else {
+                    alert('Ocurrio un error inesperado. Porfavor intentalo más tarde')
+                }
+            })
 
-            codeId = '60512e38495700c269d098f0'
-            hideModal()
-            showSmsModal()
         }
 
         function showSmsModal() {
@@ -247,6 +241,8 @@
             let comment = document.getElementById('comment').value
             let imageField = document.getElementById('reference_image')
             
+            console.log(document.getElementById('services').value)
+            console.log(serviceIndex)
             let service_id = services[serviceIndex]._id
             let user_id = users[userIndex]._id
             let start_time = bookingDate.toISOString()
