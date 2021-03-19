@@ -239,6 +239,9 @@
         function createEvent(booking) {
             let startDate = new Date(booking.start_time)
             let endDate = new Date(startDate.getTime() + booking.service.minutesDuration*60000)
+            if(booking.end_time != null) {
+                endDate = new Date(booking.end_time)
+            }
             let event = {
                 'id': booking._id,
                 'title':`${booking.service.name} - ${booking.name}`,
@@ -345,7 +348,10 @@
                 nowIndicator: true,
                 allDaySlot: false,
                 slotMinTime: '09:00:00',
-                slotMaxTime: '19:00:00'
+                slotMaxTime: '19:00:00',
+                editable: true,
+                eventDrop: dragEvent,
+                eventResize: resizeEvent
             });
             calendar.render();
         }
@@ -429,7 +435,17 @@
             let user_id = users[userIndex]._id
             let start_time = bookingDate.toISOString()
 
-            createForceBooking(start_time,service_id,user_id,name,phone).then((body) => {
+            const formData = new FormData();
+            const data = JSON.stringify({
+                phone,
+                name,
+                service_id,
+                user_id,
+                start_time
+            })
+            formData.append('data', data);
+
+            createForceBooking(formData).then((body) => {
                 console.log(body)
                 if(!body.error) {
                     // loadMonthBookings()
@@ -449,6 +465,37 @@
                     }
                 })
             }
+        }
+
+
+        function dragEvent(event) {
+            let newStartDate = new Date(event.event.startStr)
+            let start_time = newStartDate.toISOString()
+            let eventId = event.event.id
+            changeStartTime(eventId,start_time).then((body) => {
+                if(!body.error){
+                    alert('Cambio exitoso')
+                } else {
+                    event.revert()
+                    alert('Ocurrió un error inesperado')
+                }
+            })
+        }
+
+        function resizeEvent(event) {
+            let newStartDate = new Date(event.event.startStr)
+            let newEndDate = new Date(event.event.endStr)
+            let start_time = newStartDate.toISOString()
+            let end_time = newEndDate.toISOString()
+            let eventId = event.event.id
+            changeDuration(eventId,start_time,end_time).then((body) => {
+                if(!body.error) {
+                    alert('Cambio exitoso')
+                } else {
+                    alert('Ocurrió un error inesperado')
+                    event.revert()
+                }
+            })
         }
     </script>
     <title>Rosa Pastel - Admin</title>
