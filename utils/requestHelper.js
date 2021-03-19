@@ -25,6 +25,24 @@ async function requestWithBody(method,endPoint,body) {
       return data
 }
 
+async function requestWithFormData(method,endPoint,formData) {
+    response = await fetch(`${baseUrl}/${endPoint}`, {
+        method: method, 
+        body: formData,
+        headers:{
+        //   'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${getAuthToken()}`
+        }
+      })
+
+      data = response.json()
+      return data
+}
+
+async function POST_FORM_DATA(endPoint,formData) {
+    return await requestWithFormData('POST',endPoint,formData)
+}
+
 async function POST(endPoint,body){
     return await requestWithBody('POST',endPoint,body)
 }

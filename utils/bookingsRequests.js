@@ -22,18 +22,8 @@ async function createForceBooking(start_time,service_id,user_id,name,phone) {
     return await POST('booking/create/force',body)
 }
 
-async function createBooking(start_time,service_id,user_id,name,phone,sms_id,code) {
-    let body = {
-        start_time,
-        service_id,
-        user_id,
-        name,
-        phone,
-        sms_id,
-        code
-    }
-
-    return await POST('booking/create',body)
+async function createBooking(formData) {
+    return await POST_FORM_DATA('booking/create',formData)
 }
 
 async function deleteBooking(id) {

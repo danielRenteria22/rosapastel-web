@@ -293,19 +293,37 @@
         }
 
         function create() {
+            document.getElementById('loadingModal').style.display = 'block'
+            loadingAnimation.play()
             let phone = document.getElementById('phone').value
             let name = document.getElementById('name').value
             let serviceIndex = parseInt(document.getElementById('services').value)
             let userIndex = parseInt(document.getElementById('user').value)
             let code = document.getElementById('code').value
+            let comment = document.getElementById('comment').value
+            let imageField = document.getElementById('reference_image')
             
             let service_id = services[serviceIndex]._id
             let user_id = users[userIndex]._id
             let start_time = bookingDate.toISOString()
-            console.log(codeId)
+            
+            const formData = new FormData();
+            formData.append('reference_img', imageField.files[0]);
+            const data = JSON.stringify({
+                phone,
+                name,
+                service_id,
+                user_id,
+                start_time,
+                code,
+                'sms_id': codeId,
+                'comment': (comment != '')? comment : null
+            })
+            formData.append('data', data);
 
-            createBooking(start_time,service_id,user_id,name,phone,codeId,code).then((body) => {
-                console.log(body)
+            createBooking(formData).then((body) => {
+                loadingAnimation.stop()
+                document.getElementById('loadingModal').style.display = 'none'
                 if(!body.error) {
                     hideSmsModal()
                     alert('Listo! Nos vemos en rosa pastel')
@@ -364,13 +382,13 @@
                 <h4 id="eventDate">Fecha Cita: </h4>
 
                 <div class="form-group">
-                    <label>Servicios:</label>
+                    <label>Elige un servicio:</label>
                     <select onchange="serviceSelected()" class="form-control" id="services"></select>
                 </div>
 
                 <div id="modalInfo">
                     <div class="form-group">
-                        <label>Manicurista: </label>
+                        <label>Elige una manicurista: </label>
                         <select  onchange="userSelected()" class="form-control" id="user"></select>
                     </div>
     
@@ -380,6 +398,16 @@
     
                     <div class="form-group">
                         <input type="text" id="phone" placeholder="Teléfono" class="form-control form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="comment">Platicanos sobre tu diseño</label>
+                        <textarea class="form-control" id="comment" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reference_image">Si tienes alguna imagen de referencia, incluyela aquí</label>
+                        <input type="file" accept="image/*" class="form-control-file" id="reference_image">
                     </div>
     
                     <button onclick="sendSMSCode()" class="btn btn-primary">Crear</button>
