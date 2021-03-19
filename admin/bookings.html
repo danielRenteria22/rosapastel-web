@@ -20,11 +20,14 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src='fullcalendar/core/locales/es.js'></script>
     <link href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.1/css/all.css' rel='stylesheet'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.6/lottie.min.js" integrity="sha512-BB7rb8ZBAxtdJdB7nwDijJH9NC+648xSzviK9Itm+5APTtdpgKz1+82bDl4znz/FBhd0R7pJ/gQtomnMpZYzRw==" crossorigin="anonymous"></script>
     
+    <!-- Local Styles -->
+    <link rel="stylesheet" href="../assets/style/modals.css">
     <style>
         html, body {
         margin: 0;
-        padding: 0;
+        padding: 20px 20px;
         font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
         font-size: 14px;
         }
@@ -32,185 +35,6 @@
         #calendar {
         max-width: 1100px;
         margin: 40px auto;
-        }
-    </style>
-    <style>
-
-        /*
-        i wish this required CSS was better documented :(
-        https://github.com/FezVrasta/popper.js/issues/674
-        derived from this CSS on this page: https://popper.js.org/tooltip-examples.html
-        */
-      
-        .popper,
-        .tooltip {
-          position: absolute;
-          z-index: 9999;
-          background: #f1a6eb;
-          color: black;
-          width: 150px;
-          border-radius: 3px;
-          box-shadow: 0 0 2px rgba(0,0,0,0.5);
-          padding: 10px;
-          text-align: center;
-        }
-        .style5 .tooltip {
-          background: #1E252B;
-          color: #FFFFFF;
-          max-width: 200px;
-          width: auto;
-          font-size: .8rem;
-          padding: .5em 1em;
-        }
-        .popper .popper__arrow,
-        .tooltip .tooltip-arrow {
-          width: 0;
-          height: 0;
-          border-style: solid;
-          position: absolute;
-          margin: 5px;
-        }
-      
-        .tooltip .tooltip-arrow,
-        .popper .popper__arrow {
-          border-color: #f1a6eb;
-        }
-        .style5 .tooltip .tooltip-arrow {
-          border-color: #1E252B;
-        }
-        .popper[x-placement^="top"],
-        .tooltip[x-placement^="top"] {
-          margin-bottom: 5px;
-        }
-        .popper[x-placement^="top"] .popper__arrow,
-        .tooltip[x-placement^="top"] .tooltip-arrow {
-          border-width: 5px 5px 0 5px;
-          border-left-color: transparent;
-          border-right-color: transparent;
-          border-bottom-color: transparent;
-          bottom: -5px;
-          left: calc(50% - 5px);
-          margin-top: 0;
-          margin-bottom: 0;
-        }
-        .popper[x-placement^="bottom"],
-        .tooltip[x-placement^="bottom"] {
-          margin-top: 5px;
-        }
-        .tooltip[x-placement^="bottom"] .tooltip-arrow,
-        .popper[x-placement^="bottom"] .popper__arrow {
-          border-width: 0 5px 5px 5px;
-          border-left-color: transparent;
-          border-right-color: transparent;
-          border-top-color: transparent;
-          top: -5px;
-          left: calc(50% - 5px);
-          margin-top: 0;
-          margin-bottom: 0;
-        }
-        .tooltip[x-placement^="right"],
-        .popper[x-placement^="right"] {
-          margin-left: 5px;
-        }
-        .popper[x-placement^="right"] .popper__arrow,
-        .tooltip[x-placement^="right"] .tooltip-arrow {
-          border-width: 5px 5px 5px 0;
-          border-left-color: transparent;
-          border-top-color: transparent;
-          border-bottom-color: transparent;
-          left: -5px;
-          top: calc(50% - 5px);
-          margin-left: 0;
-          margin-right: 0;
-        }
-        .popper[x-placement^="left"],
-        .tooltip[x-placement^="left"] {
-          margin-right: 5px;
-        }
-        .popper[x-placement^="left"] .popper__arrow,
-        .tooltip[x-placement^="left"] .tooltip-arrow {
-          border-width: 5px 0 5px 5px;
-          border-top-color: transparent;
-          border-right-color: transparent;
-          border-bottom-color: transparent;
-          right: -5px;
-          top: calc(50% - 5px);
-          margin-left: 0;
-          margin-right: 0;
-        }
-      
-    </style>
-    <style>
-        body {font-family: Arial, Helvetica, sans-serif;}
-        
-        /* The Modal (background) */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1; /* Sit on top */
-            padding-top: 100px; /* Location of the box */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgb(0,0,0); /* Fallback color */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-        }
-        
-        /* Modal Content */
-        .modal-content {
-            position: relative;
-            background-color: #fefefe;
-            margin: auto;
-            padding: 0;
-            border: 1px solid #888;
-            width: 80%;
-            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-            -webkit-animation-name: animatetop;
-            -webkit-animation-duration: 0.4s;
-            animation-name: animatetop;
-            animation-duration: 0.4s
-        }
-        
-        /* Add Animation */
-        @-webkit-keyframes animatetop {
-            from {top:-300px; opacity:0} 
-            to {top:0; opacity:1}
-        }
-        
-        @keyframes animatetop {
-            from {top:-300px; opacity:0}
-            to {top:0; opacity:1}
-        }
-        
-        /* The Close Button */
-        .close {
-            color: white;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        
-        .close:hover,
-        .close:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        
-        .modal-header {
-            padding: 2px 16px;
-            background-color: #ffbffc;
-            color: white;
-        }
-        
-        .modal-body {padding: 2px 16px;}
-        
-        .modal-footer {
-            padding: 2px 16px;
-            background-color: #ffbffc;
-            color: white;
         }
     </style>
 
@@ -225,6 +49,7 @@
         var span = null;
         var modalSummary = null;
         var closeSummary = null
+        var loadingAnimation = null
 
         function loadMonthBookings() {
             let currentDate = new Date()
@@ -270,6 +95,7 @@
                 let serviceSelect = document.getElementById('services')
                 let emptyOption = document.createElement('option')
                 emptyOption.innerHTML = 'Seleccionar servicio...'
+                emptyOption.setAttribute('value',"null")
                 serviceSelect.appendChild(emptyOption)
                 var index = 0;
                 for(service of services){
@@ -309,11 +135,20 @@
                 modalOpen = false
                 if (event.target == modal) {
                     modal.style.display = "none";
+                    restartModalValues()
                 }
                 if(event.target == modalSummary){
                     hideSummaryModal()
                 }
-            }   
+            }
+            loadingAnimation = lottie.loadAnimation({
+                container: document.getElementById('loading'), // the dom element that will contain the animation
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                path: 'https://assets1.lottiefiles.com/packages/lf20_dkldbbpq.json' // the path to the animation json
+            }); 
+            loadingAnimation.stop()
         }
 
         function createCalendar(events) {
@@ -387,6 +222,7 @@
         function hideModal() {
             modalOpen = false
             modal.style.display = "none";
+            restartModalValues()
         }
 
         function showSummaryModal(event) {
@@ -420,12 +256,29 @@
             modalSummary.style.display = "none";
         }
 
+        function showLoadingModal() {
+            document.getElementById('loadingModal').style.display = 'block'
+            loadingAnimation.play()
+        }
+
+        function hideLoadingModal() {
+            loadingAnimation.stop()
+            document.getElementById('loadingModal').style.display = 'none'
+        }
+
 
         function loadUsers(service_id) {
+            showLoadingModal()
             getAvailableUsers(bookingDate.toISOString(),service_id).then((body) => {
+                hideLoadingModal()
+                document.getElementById('modalInfo').style.display = 'block'
                 users = body.data
                 let userSelect = document.getElementById('user')
                 userSelect.innerHTML = ''
+                let defaultOption = document.createElement('option')
+                defaultOption.innerHTML = 'Seleccionar manicurista...'
+                defaultOption.setAttribute('value',"")
+                userSelect.appendChild(defaultOption)
                 var index = 0
                 for(user of users){
                     let option = document.createElement('option')
@@ -438,6 +291,11 @@
         }
 
         function create() {
+            if(!isInfoValid()) {
+                alert('Información incorrecta o incompleta. Porfavor, revisa la información.')
+                return
+            }
+            showLoadingModal()
             let phone = document.getElementById('phone').value
             let name = document.getElementById('name').value
             let serviceIndex = parseInt(document.getElementById('services').value)
@@ -458,6 +316,8 @@
             formData.append('data', data);
 
             createForceBooking(formData).then((body) => {
+                hideLoadingModal()
+                restartModalValues()
                 console.log(body)
                 if(!body.error) {
                     // loadMonthBookings()
@@ -465,6 +325,25 @@
                     hideModal()
                 }
             })
+        }
+
+        function isInfoValid() {
+            if(document.getElementById('services').value === "null") return false
+            if(document.getElementById('user').value === "") return false
+            if(!document.getElementById('phone').value.match(/^\d{10}$/)) return false
+            if(document.getElementById('name').value === "")  return false
+            return true
+        }
+
+        function restartModalValues() {
+            document.getElementById('services').value = "null"
+            document.getElementById('user').value = ""
+            document.getElementById('phone').value = ""
+            document.getElementById('name').value = ""
+            document.getElementById('modalInfo').style.display = 'none'
+
+            let userSelect = document.getElementById('user')
+            userSelect.innerHTML = ''
         }
 
         function deleteEvent() {
@@ -513,7 +392,9 @@
     <title>Rosa Pastel - Admin</title>
 </head>
 <body>
-    <div id='calendar'></div>
+    <h1>Calendario Rosa Pastel</h1>
+    <br><br>
+    <div id='calendar' style="width: 90%; margin: auto; min-width: 380px;"></div>
 
     <!-- The Modal -->
     <div id="myModal" class="modal">
@@ -521,27 +402,32 @@
         <!-- Modal content -->
         <div class="modal-content">
             <div class="modal-header">
-                <span class="close">&times;</span>
                 <h2>Crear Cita</h2>
+                <p class="close">&times;</p>
             </div>
             <div class="modal-body">
-                <p id="eventDate">Fecha Cita: </p>
-                <label>Servicios:</label>
-                <select onchange="serviceSelected()" id="services"></select>
-                <br><br>
+                <h4 id="eventDate">Fecha Cita: </h4>
+                <div class="form-group">
+                    <label>Elige un servicio:</label>
+                    <select onchange="serviceSelected()" class="form-control" id="services"></select>
+                </div>
 
-                <label>Manicurista: </label>
-                <select  onchange="userSelected()" id="user"></select>
-                <br><br>
+                <div id="modalInfo" style="display: none;">
+                    <div class="form-group">
+                        <label>Elige una manicurista: </label>
+                        <select  onchange="userSelected()" class="form-control" id="user"></select>
+                    </div>
 
-                <label for="name">Nombre: </label>
-                <input type="text" id="name" name="name"><br><br>
-
-                <label for="phone">Num celular: </label>
-                <input type="text" id="phone" name="phone"><br><br>
-
-
-                <button onclick="create()">Crear</button>
+                    <div class="form-group">
+                        <input type="text" id="name" placeholder="Nombre" class="form-control form-control">
+                    </div>
+    
+                    <div class="form-group">
+                        <input type="text" id="phone" placeholder="Teléfono" class="form-control form-control">
+                    </div>
+                    
+                    <button onclick="create()" class="btn btn-primary">Crear</button>
+                </div>
             </div>
         </div>
     
@@ -553,8 +439,8 @@
         <!-- Modal content -->
         <div class="modal-content">
             <div class="modal-header">
-                <span class="closeSummary">&times;</span>
                 <h2>Cita</h2>
+                <p class="closeSummary">&times;</p>
             </div>
             <div class="modal-body">
                 <p id="summaryDate">Fecha Cita: </p>
@@ -573,8 +459,21 @@
                       <img id="reference_image" style="margin: auto; max-width: 350px;">
                     </div>
                 </div>
-                <br>
-                <button onclick="deleteEvent()">Eliminar</button>
+                <button onclick="deleteEvent()" class="btn btn-danger">Eliminar</button>
+            </div>
+        </div>
+    
+    </div>
+
+    <!-- Loaging Modal -->
+    <div id="loadingModal" class="modal" style="display: none;">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div class="modal-body">
+                <div id="loading"></div>
+                <center>
+                    <h4 style="margin: auto;">Cargando...</h4>
+                </center>
             </div>
         </div>
     
