@@ -113,8 +113,10 @@
                         index++
                     }
                     calendar.changeView('timeGridDay', info.dateStr);
-                    loadingAnimation.stop()
-                    document.getElementById('loadingModal').style.display = 'none'
+                    setTimeout(() => {
+                        loadingAnimation.stop()
+                        document.getElementById('loadingModal').style.display = 'none'
+                    }, 3000)
                 })
             } else {
                 openCreateBookingModal(info)
