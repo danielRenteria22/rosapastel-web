@@ -12,15 +12,25 @@
     <script src="../utils/smsRequests.js"></script>
     <script src="../utils/utils.js"></script>
     <script src="../utils/smsRequests.js"></script>
+
     <!-- CDN -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.5.1/main.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src='fullcalendar/core/locales/es.js'></script>
     <link href='https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.1/css/all.css' rel='stylesheet'>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.7.6/lottie.min.js" integrity="sha512-BB7rb8ZBAxtdJdB7nwDijJH9NC+648xSzviK9Itm+5APTtdpgKz1+82bDl4znz/FBhd0R7pJ/gQtomnMpZYzRw==" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../assets/style/modals.css">
+
+    <!-- Wizzard -->
+    <link rel="stylesheet" href="../assets/style/wizzard.css">
+    <script src="../utils/wizard.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.1.3/minty/bootstrap.min.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200&display=swap" rel="stylesheet">
+
+    <title>Rosa Pastel</title>
+
+
     <script>
         var modalOpen = false
         var bookingDate = null
@@ -35,6 +45,9 @@
         var codeId = null
         var modalInfo = ''
         var loadingAnimation = null
+        var canContinue = false;
+        var selectedUser = null
+        var selectedService = null
 
         function createCalendar(events) {
             var calendarEl = document.getElementById('calendar');
@@ -116,7 +129,7 @@
                     setTimeout(() => {
                         loadingAnimation.stop()
                         document.getElementById('loadingModal').style.display = 'none'
-                    }, 3000)
+                    }, 1000)
                 })
             } else {
                 openCreateBookingModal(info)
@@ -129,7 +142,7 @@
             let d = date.dateStr + '-07:00'
             bookingDate = new Date(d)
             let lblBookingDate = document.getElementById('eventDate')
-            lblBookingDate.innerHTML = `${formatDate(bookingDate)}`
+            // lblBookingDate.innerHTML = `${formatDate(bookingDate)}`
         }
 
         function showModal() {
@@ -189,7 +202,7 @@
                 }
                 loadingAnimation.stop()
                 document.getElementById('loadingModal').style.display = 'none'
-                modalInfo.style.display = "block"
+                // modalInfo.style.display = "block"
             })
         }
 
@@ -207,12 +220,15 @@
                 alert('Información incorrecta o incompleta. Porfavor, revisa la información.')
                 return
             }
+            canContinue = true
+            showLoading()
             let phone = document.getElementById('phone').value
             sendSMS(phone).then((body) => {
+                hideLoading()
                 if(!body.error) {
                     codeId = body.data
-                    hideModal(false)
-                    showSmsModal()
+                    // hideModal(false)
+                    // showSmsModal()
                 } else {
                     alert('Ocurrio un error inesperado. Porfavor intentalo más tarde')
                 }
@@ -228,13 +244,23 @@
             modalSms.style.display = "none";
         }
 
+        function showLoading() {
+            document.getElementById('loadingModal').style.display = 'block'
+            loadingAnimation.play()
+        }
+
+        function hideLoading() {
+            loadingAnimation.stop()
+            document.getElementById('loadingModal').style.display = 'none'
+        }
+
         function create() {
             if(document.getElementById('code').value === ""){
                 alert('Por favor, ingresa un código valido')
                 return
             }
-            document.getElementById('loadingModal').style.display = 'block'
-            loadingAnimation.play()
+            canContinue = true
+            showLoading()
             let phone = document.getElementById('phone').value
             let name = document.getElementById('name').value
             let serviceIndex = parseInt(document.getElementById('services').value)
@@ -243,8 +269,8 @@
             let comment = document.getElementById('comment').value
             let imageField = document.getElementById('reference_image')
             
-            console.log(document.getElementById('services').value)
-            console.log(serviceIndex)
+            selectedService = services[serviceIndex]
+            selectedUser = users[userIndex]  
             let service_id = services[serviceIndex]._id
             let user_id = users[userIndex]._id
             let start_time = bookingDate.toISOString()
@@ -265,12 +291,11 @@
 
             createBooking(formData).then((body) => {
                 restartModalValues()
-                loadingAnimation.stop()
-                document.getElementById('loadingModal').style.display = 'none'
+                hideLoading()
                 if(!body.error) {
-                    hideSmsModal()
-                    alert('Listo! Nos vemos en rosa pastel')
+                    setSummaryInfo()
                 } else {
+                    hideModal()
                     alert(`Ocurrio un error: ${body.message}`)
                 }
             })
@@ -284,16 +309,40 @@
             return true
         }
 
+        function checkValidServiceInfo() {
+            var result = true
+            if(document.getElementById('services').value === "null") result = false
+            if(document.getElementById('user').value === "null") result = false
+            canContinue = result
+        }
+
+        function checkValidContactInfo() {
+            var result = true
+            if(!document.getElementById('phone').value.match(/^\d{10}$/)) result = false
+            if(document.getElementById('name').value === "")  result = false
+            canContinue = result
+        }
+
         function restartModalValues() {
             document.getElementById('services').value = "null"
             document.getElementById('user').value = ""
             document.getElementById('phone').value = ""
             document.getElementById('name').value = ""
             document.getElementById('code').value = ""
-            document.getElementById('modalInfo').style.display = 'none'
+            // document.getElementById('modalInfo').style.display = 'none'
 
             let userSelect = document.getElementById('user')
             userSelect.innerHTML = ''
+        }
+
+        function setSummaryInfo() {
+            let summaryDate = document.getElementById('summaryDate')
+            let summaryUser = document.getElementById('summaryUser')
+            let summaryService = document.getElementById('summaryService')
+            
+            summaryDate.innerHTML = `Fecha: ${formatDate(bookingDate)}`
+            summaryUser.innerHTML = `Manicurista: ${selectedUser.name}`
+            summaryService.innerHTML = `Servicio: ${selectedService.name}`
         }
 
         window.onload = function() {
@@ -301,28 +350,16 @@
             loadServices()
             modal = document.getElementById("myModal");     
             span = document.getElementsByClassName("close")[0];
-            modalSms = document.getElementById('smsModal')
-            closeSms = document.getElementsByClassName("close")[1];
-            modalInfo = document.getElementById('modalInfo')
-            modalInfo.style.display = "none";
-
             span.onclick = function() {
                 hideModal()
             }
 
-            closeSms.onclick = function() {
-                hideSmsModal()
-            }
-
+        
             window.onclick = function(event) {
                 modalOpen = false
                 if (event.target == modal) {
                     modal.style.display = "none";
                     restartModalValues()
-                }
-
-                if(event.target == modalSms){
-                    hideSmsModal()
                 }
             }   
         }
@@ -338,79 +375,126 @@
     <div id='calendar' style="width: 90%; margin: auto; min-width: 380px;"></div>
     <!-- Booking modal -->
     <div id="myModal" class="modal">
-
         <!-- Modal content -->
-        <div class="modal-content">
+        <div class="modal-content-new">
             <div class="modal-header">
                 <h2>Crear Cita</h2>
                 <p class="close">&times;</p>
             </div>
             <div class="modal-body">
-                <h4 id="eventDate">Fecha Cita: </h4>
+                <div class="multisteps-form">
+                    <!--progress bar-->
+                    <div class="row">
+                      <div class="col-12 col-lg-8 ml-auto mr-auto">
+                        <div class="multisteps-form__progress">
+                          <button class="multisteps-form__progress-btn js-active" type="button" title="User Info">Servicio</button>
+                          <button class="multisteps-form__progress-btn" type="button" title="Address">Tú contacto</button>
+                          <button class="multisteps-form__progress-btn" type="button" title="Order Info">Diseño</button>
+                          <button class="multisteps-form__progress-btn" type="button" title="Comments">Confirmar Telefonó</button>
+                          <button class="multisteps-form__progress-btn" type="button" title="Comments">Resumen</button>
+                        </div>
+                      </div>
+                    </div>
+                    <!--form panels-->
+                    <div class="row">
+                      <div class="col-12 col-lg-8 m-auto">
+                        <form class="multisteps-form__form">
+                          <!-- Service Panel-->
+                          <div class="multisteps-form__panel p-1 rounded bg-white js-active" data-animation="fadeIn">
+                            <div class="multisteps-form__content">
+                              <div class="form-row mt-4">
+                                <div class="col-12">
+                                    <label>Elige un servicio:</label>
+                                    <select onchange="serviceSelected()" class="form-control" id="services"></select>
+                                </div>
+                              </div>
+                              <div class="form-row mt-4">
+                                <div class="col-12">
+                                    <label>Elige una manicurista: </label>
+                                    <select  onchange="userSelected()" class="form-control" id="user"></select>
+                                </div>
+                              </div>
+                              <div class="button-row d-flex mt-4">
+                                <button class="btn btn-primary ml-auto js-btn-next" onclick="checkValidServiceInfo()" type="button" title="Next">Siguiente</button>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- Contact panel -->
+                          <div class="multisteps-form__panel p-4 rounded bg-white" data-animation="fadeIn">
+                            <div class="multisteps-form__content">
+                              <div class="form-row mt-4">
+                                <div class="col">
+                                    <input type="text" id="name" placeholder="Nombre" class="form-control form-control">
+                                </div>
+                              </div>
+                              <div class="form-row mt-4">
+                                <div class="col">
+                                    <input type="text" id="phone" placeholder="Teléfono" class="form-control form-control">
+                                </div>
+                              </div>
+                              <div class="button-row d-flex mt-4">
+                                <button class="btn btn-primary js-btn-prev" type="button" title="Prev">Atrás</button>
+                                <button class="btn btn-primary ml-auto js-btn-next" onclick="checkValidContactInfo()" type="button" title="Next">Siguiente</button>
+                              </div>
+                            </div>
+                          </div>
+                          <!--Design panel-->
+                          <div class="multisteps-form__panel p-4 rounded bg-white" data-animation="fadeIn">
+                            <div class="multisteps-form__content">
+                              <div class="row">
+                                <label for="comment">Platicanos sobre tu diseño (Opcional)</label>
+                                <textarea class="form-control" id="comment" rows="3"></textarea>
+                                
+                                <label for="reference_image">Si tienes alguna imagen de referencia, incluyela aquí</label>
+                                <input type="file" accept="image/*" class="form-control-file" id="reference_image">
+                              </div>
+                              <div class="row">
+                                <div class="button-row d-flex mt-4 col-12">
+                                  <button class="btn btn-primary js-btn-prev" type="button" title="Prev">Atrás</button>
+                                  <button class="btn btn-primary ml-auto js-btn-next" onclick="sendSMSCode()" type="button" title="Next">Siguiente</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- Confirm SMS code panel-->
+                          <div class="multisteps-form__panel p-4 rounded bg-white" data-animation="fadeIn">
+                            <h3 class="multisteps-form__title">Ingresa el codigo que se envio a tu telefono</h3>
+                            <div class="multisteps-form__content">
+                              <div class="form-row mt-4">
+                                <input type="text" id="code" placeholder="Código" class="form-control form-control">
+                              </div>
+                              <div class="button-row d-flex mt-4">
+                                <button class="btn btn-primary ml-auto js-btn-next" type="button" onclick="create()" title="Next">Confirmar</button>
+                              </div>
+                            </div>
+                          </div>
 
-                <div class="form-group">
-                    <label>Elige un servicio:</label>
-                    <select onchange="serviceSelected()" class="form-control" id="services"></select>
-                </div>
-
-                <div id="modalInfo">
-                    <div class="form-group">
-                        <label>Elige una manicurista: </label>
-                        <select  onchange="userSelected()" class="form-control" id="user"></select>
+                          <!-- Summary panel-->
+                          <div class="multisteps-form__panel p-4 rounded bg-white" data-animation="fadeIn">
+                            <h3 class="multisteps-form__title">¡Listo! Nos vemos pronto en Rosa Pastel</h3>
+                            <div class="multisteps-form__content">
+                              <div class="form-row mt-4">
+                                <label id="summaryDate">Fecha Cita: </label><br>
+                                <label id="summaryUser">Manicurista: </label><br>
+                                <label id="summaryService">Servicio: </label><br>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                        </div>
                     </div>
-    
-                    <div class="form-group">
-                        <input type="text" id="name" placeholder="Nombre" class="form-control form-control">
-                    </div>
-    
-                    <div class="form-group">
-                        <input type="text" id="phone" placeholder="Teléfono" class="form-control form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="comment">Platicanos sobre tu diseño</label>
-                        <textarea class="form-control" id="comment" rows="3"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="reference_image">Si tienes alguna imagen de referencia, incluyela aquí</label>
-                        <input type="file" accept="image/*" class="form-control-file" id="reference_image">
-                    </div>
-    
-                    <button onclick="sendSMSCode()" class="btn btn-primary">Crear</button>
                 </div>
             </div>
         </div>
-    
-    </div>
-
-    <!-- SMS Modal -->
-    <div id="smsModal" class="modal">
-
-        <!-- Modal content -->
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Confirmar Teléfono</h2>
-                <p class="close">&times;</p>
-            </div>
-            <div class="modal-body">
-                <br>
-                <div class="form-group">
-                    <input type="text" id="code" placeholder="Código" class="form-control form-control">
-                </div>
-                <button onclick="create()" class="btn btn-primary">Confirmar</button>
-            </div>
-        </div>
-    
     </div>
 
     <!-- Loaging Modal -->
     <div id="loadingModal" class="modal" style="display: none;">
 
         <!-- Modal content -->
-        <div class="modal-content">
+        <div class="modal-content-new">
             <div class="modal-body">
-                <div id="loading"></div>
+                <div id="loading" style="height: 400px;"></div>
                 <center>
                     <h4 style="margin: auto;">Cargando...</h4>
                 </center>
