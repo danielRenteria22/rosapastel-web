@@ -1,6 +1,13 @@
-let baseUrl = 'http://127.0.0.1:5000'
+function getBaseUrl() {
+    if (location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.hostname === "") {
+        return 'http://127.0.0.1:5000' 
+    } else {
+        return 'https://rosapastel-api.herokuapp.com'
+    }
+}
 
 async function GET(endPoint){
+    let baseUrl = getBaseUrl()
     response = await fetch(`${baseUrl}/${endPoint}`, {
         headers:{
             'Content-Type': 'application/json',
@@ -12,6 +19,7 @@ async function GET(endPoint){
 }
 
 async function requestWithBody(method,endPoint,body) {
+    let baseUrl = getBaseUrl()
     response = await fetch(`${baseUrl}/${endPoint}`, {
         method: method, 
         body: JSON.stringify(body),
@@ -26,6 +34,7 @@ async function requestWithBody(method,endPoint,body) {
 }
 
 async function requestWithFormData(method,endPoint,formData) {
+    let baseUrl = getBaseUrl() 
     response = await fetch(`${baseUrl}/${endPoint}`, {
         method: method, 
         body: formData,
