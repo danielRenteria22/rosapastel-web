@@ -1,9 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html 
+    lang="en"
+    class="csspositionsticky supports backgroundblendmode objectfit object-fit backgroundcliptext cssfilters cssmask backdropfilter"
+>
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta 
+        name="viewport" 
+        content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    >
     <!-- Local JS -->
     <script src="../utils/requestHelper.js"></script>
     <script src="../utils/bookingsRequests.js"></script>
@@ -27,6 +33,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/4.1.3/minty/bootstrap.min.css">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200&display=swap" rel="stylesheet">
+
+    <!-- Header -->
+    <link rel="stylesheet" href="../assets-landing/vtq7trz.css" />
+    <link rel="stylesheet" href="../assets-landing/liquid-icon.min.css"/>
+    <link rel="stylesheet" href="../assets-landing/font-awesome.min.css"/>
+    <link rel="stylesheet" href="../assets-landing/theme-vendors.min.css"/>
+    <link rel="stylesheet" href="../assets-landing/theme.min.css" />
+    <link rel="stylesheet" href="../assets-landing/voguish.css" />
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+    <meta name="theme-color" content="#3ed2a7" />
+    <link rel="shortcut icon" href="http://avehtml.liquid-themes.com/favicon.png"/>
+    <script async="" src="../assets-landing/modernizr.min.js"></script>
 
     <title>Rosa Pastel</title>
 
@@ -52,21 +70,10 @@
         function createCalendar(events) {
             var calendarEl = document.getElementById('calendar');
             calendar = new FullCalendar.Calendar(calendarEl, {
-                views: {
-                    dayGridMonth: {
-                        headerToolbar: {
-                            left: 'prev,next today',
-                            center: 'title',
-                            right: 'dayGridMonth,timeGridDay'
-                        }
-                    },
-                    timeGridDay: {
-                        headerToolbar: {
-                            left: '',
-                            center: 'title',
-                            right: 'dayGridMonth,timeGridDay'
-                        },
-                    }
+                headerToolbar: {
+                    left: 'prev,next',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridDay'
                 },
                 timeZone: 'America/Chihuahua',
                 events: events,
@@ -95,23 +102,25 @@
                 allDaySlot: false,
                 slotMinTime: '09:00:00',
                 slotMaxTime: '19:00:00',
+                datesSet: daySelected
             });
             calendar.render();
         }
 
         function onDateClicked(info) {
             let dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if(info.dateStr.match(dateRegex)) {   
+                calendar.changeView('timeGridDay', info.dateStr);
+            } else {
+                openCreateBookingModal(info)
+            }
+        }
 
-            if(info.dateStr.match(dateRegex)) {
-                document.getElementById('loadingModal').style.display = 'block'
-                loadingAnimation = lottie.loadAnimation({
-                    container: document.getElementById('loading'), // the dom element that will contain the animation
-                    renderer: 'svg',
-                    loop: true,
-                    autoplay: true,
-                    path: 'https://assets1.lottiefiles.com/packages/lf20_dkldbbpq.json' // the path to the animation json
-                });
-                getUnAvailableIntervals(info.dateStr).then((body) => {
+        function daySelected(dateInfo) {
+            if(dateInfo.view.type == 'timeGridDay') {
+                let dateDay =  dateInfo.startStr.substring(0,10)
+                showLoading()
+                getUnAvailableIntervals(dateDay).then((body) => {
                     let index = 1
                     for(unavailableTime of body.data){
                         let event = {
@@ -125,14 +134,11 @@
                         calendar.addEvent(event)
                         index++
                     }
-                    calendar.changeView('timeGridDay', info.dateStr);
                     setTimeout(() => {
-                        loadingAnimation.stop()
-                        document.getElementById('loadingModal').style.display = 'none'
+                        hideLoading()
                     }, 1000)
                 })
-            } else {
-                openCreateBookingModal(info)
+
             }
         }
 
@@ -361,18 +367,215 @@
                     modal.style.display = "none";
                     restartModalValues()
                 }
-            }   
+            }
+            
+            loadingAnimation = lottie.loadAnimation({
+                container: document.getElementById('loading'), // the dom element that will contain the animation
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                path: 'https://assets1.lottiefiles.com/packages/lf20_dkldbbpq.json' // the path to the animation json
+            }); 
+            loadingAnimation.stop()
         }
 
 
     </script>
     <title>Rosa Pastel</title>
 </head>
-<body>
-    <br>
-    <h1>Bienvenida a Rosa Pastel</h1>
-    <br><br>
-    <div id='calendar' style="width: 90%; margin: auto; min-width: 380px;"></div>
+<body
+    data-mobile-nav-trigger-alignment="right"
+    data-mobile-nav-align="left"
+    data-mobile-nav-style="minimal"
+    data-mobile-nav-shceme="gray"
+    data-mobile-header-scheme="gray"
+    data-mobile-nav-breakpoint="1199"
+>
+    <div id="wrap">
+        <header
+            class="main-header main-header-overlay bb-fade-white-015"
+            data-sticky-header="true"
+            data-sticky-options='{ "stickyTrigger": "first-section" }'
+            style="background-color: #E7A285;"
+        >
+        <div class="lqd-sticky-placeholder hide" style="height: 66px"></div>
+        <div class="mainbar-wrap">
+        <div class="megamenu-hover-bg"></div>
+        <div class="container-fluid mainbar-container">
+            <div class="mainbar">
+            <div class="row mainbar-row align-items-lg-stretch px-4">
+                <div class="col pr-5">
+                <div class="navbar-header">
+                    <a
+                    class="navbar-brand pt-20 pb-20"
+                    href="http://avehtml.liquid-themes.com/index-creative.html"
+                    rel="home"
+                    >
+                    <span class="navbar-brand-inner">
+                        <img
+                        class="logo-sticky"
+                        src="../assets-landing/voguish-dark.svg"
+                        alt="Ave WordPress Theme"
+                        />
+                        <img
+                        class="mobile-logo-default"
+                        src="../assets-landing/voguish-dark.svg"
+                        alt="Ave HTML Template"
+                        />
+                        <img
+                        class="logo-default"
+                        src="../assets-landing/voguish-light.svg"
+                        alt="Ave HTML Template"
+                        />
+                    </span>
+                    </a>
+                    <button
+                    type="button"
+                    class="navbar-toggle collapsed nav-trigger style-mobile"
+                    data-toggle="collapse"
+                    data-target="#main-header-collapse"
+                    aria-expanded="false"
+                    data-changeclassnames='{ "html": "mobile-nav-activated overflow-hidden" }'
+                    >
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="bars">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </span>
+                    </button>
+                </div>
+                </div>
+                <div class="col">
+                <div
+                    class="collapse navbar-collapse"
+                    id="main-header-collapse"
+                    aria-expanded="false"
+                >
+                    <ul
+                    id="primary-nav"
+                    class="main-nav nav align-items-lg-stretch justify-content-lg-center"
+                    data-submenu-options='{ "toggleType":"fade", "handler":"mouse-in-out" }'
+                    data-localscroll="true"
+                    >
+                    <li class="active is-active">
+                        <a
+                        href="http://avehtml.liquid-themes.com/index-voguish.html#content"
+                        >
+                        <span class="link-icon"></span>
+                        <span class="link-txt">
+                            <span class="link-ext"></span>
+                            <span class="txt">Home</span>
+                        </span>
+                        </a>
+                    </li>
+                    <li class="">
+                        <a
+                        href="http://avehtml.liquid-themes.com/index-voguish.html#about"
+                        >
+                        <span class="link-icon"></span>
+                        <span class="link-txt">
+                            <span class="link-ext"></span>
+                            <span class="txt">About</span>
+                        </span>
+                        </a>
+                    </li>
+                    <li class="">
+                        <a
+                        href="http://avehtml.liquid-themes.com/index-voguish.html#case-studies"
+                        >
+                        <span class="link-icon"></span>
+                        <span class="link-txt">
+                            <span class="link-ext"></span>
+                            <span class="txt">Case Studies</span>
+                        </span>
+                        </a>
+                    </li>
+                    <li class="">
+                        <a
+                        href="http://avehtml.liquid-themes.com/index-voguish.html#features"
+                        >
+                        <span class="link-icon"></span>
+                        <span class="link-txt">
+                            <span class="link-ext"></span>
+                            <span class="txt">Features</span>
+                        </span>
+                        </a>
+                    </li>
+                    <li class="">
+                        <a
+                        href="http://avehtml.liquid-themes.com/index-voguish.html#blog"
+                        >
+                        <span class="link-icon"></span>
+                        <span class="link-txt">
+                            <span class="link-ext"></span>
+                            <span class="txt">Blog</span>
+                        </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a
+                        href="http://avehtml.liquid-themes.com/index-voguish.html#buy"
+                        >
+                        <span class="link-icon"></span>
+                        <span class="link-txt">
+                            <span class="link-ext"></span>
+                            <span class="txt">Citas</span>
+                        </span>
+                        </a>
+                    </li>
+                    </ul>
+                </div>
+                </div>
+                <div class="col text-right">
+                <div class="header-module">
+                    <ul
+                    class="social-icon social-icon-sm scheme-white font-size-16"
+                    >
+                    <li>
+                        <a
+                        href="http://avehtml.liquid-themes.com/index-voguish.html#"
+                        target="_blank"
+                        ><i class="fa fa-pinterest-p"></i
+                        ></a>
+                    </li>
+                    <li>
+                        <a
+                        href="http://avehtml.liquid-themes.com/index-voguish.html#"
+                        target="_blank"
+                        ><i class="fa fa-twitter"></i
+                        ></a>
+                    </li>
+                    <li>
+                        <a
+                        href="http://avehtml.liquid-themes.com/index-voguish.html#"
+                        target="_blank"
+                        ><i class="fa fa-youtube-play"></i
+                        ></a>
+                    </li>
+                    </ul>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+        </header>
+
+        <main id="content" class="content">
+            <section class="vc_row fullheight d-flex flex-wrap align-items-center bg-cover bg-center py-7 mb-100">
+                <div class="container">
+                    <div class="row">
+                        <div style="width: auto;">
+                            <h2>Bienvenida a Rosa Pastel</h2>
+                            <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Unde, eius. Laborum dolor maxime accusamus saepe molestiae! Deleniti dolores doloribus quod alias harum minima rem fugiat saepe praesentium, quia temporibus eveniet.</p>
+                        </div>
+                        <div id='calendar' style="width: 80%; margin: auto; min-width: 380px;"> 
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
     <!-- Booking modal -->
     <div id="myModal" class="modal">
         <!-- Modal content -->
@@ -502,5 +705,42 @@
         </div>
     
     </div>
+
+    <script src="../assets-landing/jquery.min.js"></script>
+    <script src="../assets-landing/theme-vendors.js"></script>
+    <script src="../assets-landing/theme.min.js"></script>
+    <script src="../assets-landing/liquidAjaxMailchimp.min.js"></script>
+    <style type="text/css">
+      .lqd-buy-now {
+        position: fixed;
+        right: 30px;
+        bottom: 30px;
+        z-index: 999;
+      }
+      .lqd-buy-now-btn {
+        display: inline-flex;
+        padding: 15px 30px;
+        align-items: center;
+        border: none;
+        border-radius: 50em;
+        background: #fff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        font-size: 15px;
+        line-height: 1.5em;
+        color: #000;
+        transition: all 0.3s;
+      }
+      .lqd-buy-now-btn svg {
+        margin-right: 12px;
+      }
+      .lqd-buy-now-btn:hover {
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        transform: translateY(-2px);
+      }
+      .lqd-buy-now-btn:hover svg {
+        fill: currentColor;
+      }
+    </style>
 </body>
 </html>
