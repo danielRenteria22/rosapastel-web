@@ -48,6 +48,56 @@
 
     <title>Rosa Pastel</title>
 
+    <style>
+        .fc-prev-button {
+            background-color: #E7A285;
+            color: white;
+            width: 60px;
+            height: 30px;
+            text-align: center;
+        }
+
+        .fc-next-button {
+            background-color: #E7A285;
+            color: white;
+            width: 60px;
+            height: 30px;
+        }
+
+        .btn-primary {
+            background-color: #E7A285;
+            color: white;   
+            width: 60px;
+            height: 30px;
+            
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .fc-dayGridMonth-button.btn.btn-primary.active {
+            background-color: #eec5b4;
+            color: white;
+            border-color: #E7A285;
+        }
+
+        .fc-timeGridDay-button.btn.btn-primary.active {
+            background-color: #eec5b4;
+            color: white;
+            border-color: #E7A285;
+        }
+
+        .fa.fa-chevron-left {
+            margin: auto;
+            padding: 0px;
+        }
+
+        .fa.fa-chevron-right {
+            margin: auto;
+            padding: 0px;
+        }
+    </style>
+
 
     <script>
         var modalOpen = false
@@ -581,7 +631,7 @@
         <!-- Modal content -->
         <div class="modal-content-new">
             <div class="modal-header">
-                <h2>Crear Cita</h2>
+                <h2 style="margin: 0px;">Crear Cita</h2>
                 <p class="close">&times;</p>
             </div>
             <div class="modal-body">
