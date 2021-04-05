@@ -32,3 +32,18 @@ async function getAvailableUsers(start_time,service_id) {
 async function getAll() {
     return await GET('user/all')
 }
+
+async function getSchedules(userId) {
+    return await GET(`user/schedule/${userId}`)
+}
+
+async function deleteSchedule(userId,scheduleId) {
+    return await DELETE(`user/schedule/${userId}/${scheduleId}`,{})
+}
+
+async function setSchedules(userId,schedules) {
+    let body = {
+        schedules
+    }
+    return await PATCH(`user/schedule/${userId}`,body)
+}

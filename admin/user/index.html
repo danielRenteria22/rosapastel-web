@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rosa Pastel</title>
+
+    <!-- Local JS -->
+    <script src="../../utils/requestHelper.js"></script>
+    <script src="../../utils/userRequests.js"></script>
+    <script src="../../utils/utils.js"></script>
+
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="../../assets/style/main.css">
+
+    <!-- CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <style>
+        .option-select {
+            margin-right: 15px;
+        }
+
+        .schedule-div {
+            margin-bottom: 15px;
+        }
+    </style>
+
+    <script>
+        let schedules = []
+        let userSchedules = []
+        let userId;
+
+        function createSelectHour(value = null,disabled = false) {
+            let select = document.createElement('select')
+            select.className = 'option-select'
+            for(var i = 0; i <= 23; i++){
+                var option = document.createElement('option')
+                option.innerHTML = `${formatTimeNumber(i)}:00`
+                option.setAttribute('value',`${formatTimeNumber(i)}:00`)
+
+                var option2 = document.createElement('option')
+                option2.innerHTML = `${formatTimeNumber(i)}:30`
+                option2.setAttribute('value',`${formatTimeNumber(i)}:30`)
+
+                select.appendChild(option)
+                select.appendChild(option2)
+            }
+
+            if(value != null) {
+                select.value = value
+            }
+
+            if(disabled) {
+                select.setAttribute('disabled','')
+            }
+
+            return select
+        }
+
+        function formatTimeNumber(num) {
+            if(num >= 10) return num
+            return `0${num}`
+        }
+
+        function createDaySelect(value = null,disabled = false) {
+            let select = document.createElement('select')
+            select.className = 'option-select'
+            let days = ['Lunes','Martes','Miercoes','Jueves','Viernes','Sábado','Domingo']
+            for(var i = 0; i < days.length; i++) {
+                select.appendChild(createDayOption(i,days[i]))
+            }
+
+            if(value != null) {
+                select.value = value
+            }
+
+            if(disabled) {
+                select.setAttribute('disabled','')
+            }
+
+            return select
+        }
+
+        function createDayOption(value,day) {
+            let option = document.createElement('option')
+            option.innerHTML = day
+            option.setAttribute('value',value)
+            return option
+        }
+
+        function createShiftPicker(day=null,start=null,end=null,newShift=true,index=null, add=true){
+            let schedule = {}
+        
+            let dayPicker = createDaySelect(day,!newShift)
+            let startDatePicker = createSelectHour(start,!newShift)
+            let endDatePicker = createSelectHour(end,!newShift)
+            if(newShift && day != null) {
+                dayPicker = day
+                startDatePicker = start
+                endDatePicker = end
+            } 
+            
+            if(newShift && add) {
+                schedule.daypicker = dayPicker
+                schedule.startTimePicker = startDatePicker
+                schedule.endTimePicker = endDatePicker
+                schedules.push(schedule)
+            }
+
+            if(index == null){
+                index = schedules.length - 1
+            }
+
+
+            let div = document.createElement('div')
+            div.className = 'schedule-div'
+            div.appendChild(createLabel('Día: '))
+            div.appendChild(dayPicker)
+
+            div.appendChild(createLabel('Inicio: '))
+            div.appendChild(startDatePicker)
+
+            div.appendChild(createLabel('Fin: '))
+            div.appendChild(endDatePicker)
+
+            div.appendChild(createDelteButton(index,newShift))
+
+            let schedulesDiv = document.getElementById('idSelect')
+            schedulesDiv.appendChild(div)
+        }
+
+        function createDelteButton(index,isNew) {
+            let button = document.createElement('button')
+            button.innerHTML = 'Eliminar'
+            button.className = 'btn btn-danger'
+            if(!isNew) {
+                button.onclick = function() {
+                    let scheduleId = userSchedules[index]._id
+                    deleteSchedule(userId,scheduleId).then((body) => {
+                        if(!body.error) {
+                            alert('Horario eliminado')
+                        } else {
+                            alert(body.message)
+                        }
+                    })
+                    userSchedules.splice(index,1)
+                    let schedulesDiv = document.getElementById('idSelect')
+                    schedulesDiv.innerHTML = ''
+                    drawShifts()
+
+                }
+            } else {
+                button.onclick = function() {
+                    console.log(index)
+                    schedules.splice(index,1)
+                    let schedulesDiv = document.getElementById('idSelect')
+                    schedulesDiv.innerHTML = ''
+                    drawShifts()
+                }
+            }
+
+            return button
+        }
+
+        function createLabel(str) {
+            let label = document.createElement('label')
+            label.innerHTML = str
+            return label
+        }
+
+        function drawShifts() {
+            var index = 0
+            for(let schedule of userSchedules) {
+                createShiftPicker(
+                    schedule.weekDay,
+                    schedule.startTime,
+                    schedule.endTime,
+                    false,
+                    index,
+                    false
+                )
+                index++
+            }
+
+            index = 0
+            for(let schedule of schedules) {
+                createShiftPicker(
+                    schedule.daypicker,
+                    schedule.startTimePicker,
+                    schedule.endTimePicker,
+                    true,
+                    index,
+                    false
+                )
+                index++
+            }
+        }
+
+
+        function printSchedules() {
+            for(let schedule of schedules) {
+                console.log(`Día: ${schedule.daypicker.value}`)
+                console.log(`Inicio: ${schedule.startTimePicker.value}`)
+                console.log(`Fin: ${schedule.endTimePicker.value}`)
+                console.log('_________________________________________')
+            }
+        }
+
+        function loadSchedules() {
+            getSchedules(userId).then((body) => {
+                userSchedules = body.data
+                drawShifts()
+            })
+        }
+
+        function saveSchedules() {
+            let bodySchedules = []
+            for(let schedule of schedules) {
+                bodySchedules.push({
+                    'weekday': parseInt(schedule.daypicker.value),
+                    'startTime': schedule.startTimePicker.value,
+                    'endTime': schedule.endTimePicker.value
+                })
+            }
+            setSchedules(userId,bodySchedules).then((body) => {
+                if(!body.error){
+                    location.reload();
+                } else {
+                    alert(body.message)
+                }
+            })
+        }
+
+
+        window.onload = function() {
+            drawShifts()
+            userId = localStorage.getItem('user_id')
+            loadSchedules()
+
+            let userName = localStorage.getItem('user_name')
+            document.getElementById('name').innerHTML = userName
+        }
+    </script>
+</head>
+<body>
+    <h3 id="name"></h3>
+    <div id="idSelect"></div>
+    <button class="btn btn-primary" onclick="createShiftPicker()">Agregar horario</button>
+    <button class="btn btn-success" onclick="saveSchedules()">Guardar horarios nuevos</button>
+</body>
+</html>

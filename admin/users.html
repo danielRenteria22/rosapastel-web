@@ -47,6 +47,13 @@
                 deleteUserFront(user.email)
             }
 
+            let schedulesButton = document.createElement('button')
+            schedulesButton.innerHTML = 'Ver horarios'
+            schedulesButton.className = 'btn btn-secondary ml-3'
+            schedulesButton.onclick = function() {
+                goToSchedules(user)
+            }
+
             let body = document.createElement('div')
             body.className = 'card-body'
             body.appendChild(emailLabel)
@@ -60,6 +67,7 @@
                 // body.appendChild(document.createElement('br'))
             }
             body.appendChild(deleteButton)
+            body.appendChild(schedulesButton)
 
 
             let userDiv = document.createElement('div')
@@ -87,6 +95,12 @@
                 console.log(body)
                 loadUsers()
             })
+        }
+
+        function goToSchedules(user) {
+            localStorage.setItem('user_id',user._id)
+            localStorage.setItem('user_name',user.name)
+            window.location.href = "user/index.html"
         }
 
         window.onload = function() {
