@@ -208,7 +208,7 @@
         function openCreateBookingModal(date) {
             if(modalOpen) return
             showModal()
-            let d = date.dateStr + '-07:00'
+            let d = date.dateStr + getOffset()
             bookingDate = new Date(d)
             let lblBookingDate = document.getElementById('eventDate')
             lblBookingDate.innerHTML = `Fecha y hora: ${formatDate(bookingDate)}`
