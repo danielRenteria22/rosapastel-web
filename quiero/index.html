@@ -198,10 +198,24 @@
         function openCreateBookingModal(date) {
             if(modalOpen) return
             showModal()
-            let d = date.dateStr + '-07:00'
+            let d = date.dateStr + getOffset()
             bookingDate = new Date(d)
             let lblBookingDate = document.getElementById('eventDate')
             // lblBookingDate.innerHTML = `${formatDate(bookingDate)}`
+        }
+
+        function getOffset() {
+            var date = new Date();
+            var offset = date.getTimezoneOffset();
+            let sign = offset >= 0? "-" : "+";
+            let hours = formatTime(Math.floor(offset / 60));
+            let minutes = formatTime(offset % 60)
+            return `${sign}${hours}:${minutes}`
+        }
+
+        function formatTime(time) {
+            if(time >= 10) return time
+            return `0${time}`
         }
 
         function showModal() {
